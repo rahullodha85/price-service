@@ -1,0 +1,44 @@
+# price-service
+
+## Prequisites
+[Prerequisite Setup](https://github.com/saksdirect/HBCPlatformDocs/blob/master/gettingStarted/backendDevWorkstation/README.md#prerequisite-setup)  
+
+## Commands
+- To create a new box with containers running
+
+     ```
+      sbt build-zip
+      
+      vagrant up
+      ```
+  - To run clean, test, and deploy your latest code
+
+     ```
+      sbt pre-commit
+      ```
+  - Sbt commands:
+     - build-zip: Compiles, tests, and publishes a zip file with the new code.
+     - pre-commit: Compiles, tests, zips code, and then refreshes docker container.
+
+## Routes
+
+[list all routes that this service supports]
+
+| Method | Route | Class | Description
+| ------ | ----- | ----- | -----------
+| GET | /price-service | controllers.Application.index | Index Page
+| PUT | /price-service/logLevel/$level | controllers.Application.changeLogLevel | Change Log Level
+| GET | /price-service/logLevel/$level | controllers.Application.changeLogLevel | Change Log Level (Convenient Method)
+| GET | /price-service/admin/ping | controllers.Admin.ping | Ping Service
+| GET | /price-service/admin/jvmstats | controllers.Admin.jvmstats | Display current JVM Stats
+| GET | /price-service/$banner/admin/toggles | controllers.Application.toggles | Display toggles cache for given banner
+| GET | /price-service/$banner/admin/clear_toggles | controllers.Application.clearToggles | Clear toggles cache for given banner
+| GET | /price-service/$banner/prices/$upcCode | controllers.Price.priceByUpcCode | Display price data
+| GET | /price-service/$banner/prices?product_code | controllers.Price.pricesByProductCode| Display price data
+| POST | /price-service/$banner/prices (payload field: product_codes) | controllers.Price.pricesByProductCodes | Display price data
+| GET | /price-service/intl-rate/currency/$currencyCode | controllers.Price.getInternationalRateByCurrencyCode | Display intl price rate data
+| GET | /price-service/intl-rate/country/$countryCode | controllers.Price.getInternationalRateByCountryCode | Display intl price rate data
+
+# Architecture
+
+[describe how this service interacts with other external systems]

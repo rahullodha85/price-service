@@ -1,0 +1,362 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+#    ___     ____     __  ___    ____    _   __
+#   /   |   / __ \   /  |/  /   /  _/   / | / /
+#  / /| |  / / / /  / /|_/ /    / /    /  |/ /
+# / ___ | / /_/ /  / /  / /   _/ /    / /|  /
+#/_/  |_|/_____/  /_/  /_/   /___/   /_/ |_/
+
+###
+# summary: Get service api documentation
+# description:  Returns the service api documentation. Returns a json.
+#
+# tags:
+#   - admin
+###
+GET     /admin/api-docs                               controllers.Application.getApiDocs
+
+###
+# summary: Get service api documentation UI static resources
+# description:  Returns service api documentation UI static resources.
+#
+# tags:
+#   - admin
+###
+GET   /admin/api-docs/ui/*file                    controllers.Assets.at(path:String="/public/lib/swagger-ui", file:String)
+
+###
+# summary: Renders swagger UI
+# description:  Returns the Swagger UI for the api documentation.
+#
+# tags:
+#   - admin
+###
+GET           /admin/api-docs/ui                                                     controllers.Application.renderSwaggerUi
+
+
+###
+# summary: General Health Check
+# description:  Basic health check. Returns a json.
+#
+# tags:
+#   - admin
+###
+GET     /admin/status              controllers.Application.index
+
+###
+# summary: Health Check
+# description:  Basic health check. Returns a json.
+#
+# tags:
+#   - admin
+###
+GET     /admin/ping                controllers.Admin.ping
+
+###
+# summary: Get JVM Stats
+# description:  Returns JVM Stats.
+#
+# tags:
+#   - admin
+# responses:
+#   200:
+#     description: success
+#     schema:
+#       $ref: '#/definitions/scala.collection.mutable.Map'
+###
+GET     /admin/jvmstats            controllers.Admin.jvmstats
+
+###
+# summary: Get Akka Actor config
+# description:  Returns Akka Actor config. Returns a json.
+#
+# tags:
+#   - admin
+###
+GET     /admin/dispatcherSettings  controllers.Admin.dispatcherSettings
+
+###
+# summary: Change Log Level
+# description:  Change the log level of this service. Returns a string.
+#
+# tags:
+#   - admin
+# parameters:
+#   - name: level
+#     type: string
+#     enum: ["ALL", "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "OFF"]
+#     description: Log level to set.
+###
+PUT     /admin/logLevel/$level<(ALL|TRACE|DEBUG|INFO|WARN|ERROR|OFF)> controllers.Application.changeLogLevel(level: String)
+
+###
+# summary: Clear Toggles
+# description: Clear the toggles cache, if you pass a toggle name under ?name=toggle_name it will clear that toggle, otherwise clear everything. Returns a string.
+#
+# tags:
+#   - admin
+# parameters:
+#   - in: path
+#     name: banner
+#     type: string
+#     enum: [s5a, o5a, lat]
+#     description: a valid Banner name
+#     required: true
+###
+GET     /:banner/admin/clear_toggles     controllers.Application.clearToggles(name: Option[String], banner: constants.Banner.Value)
+
+###
+# summary: Get Toggles
+# description: See what toggles our service has, if you pass a toggle name under ?name=toggle_name it will fetch that toggle, otherwise fetch everything. Returns a string.
+#
+# tags:
+#   - admin
+# parameters:
+#   - in: path
+#     name: banner
+#     type: string
+#     enum: [s5a, o5a, lat]
+#     description: a valid Banner name
+#     required: true
+# responses:
+#    200:
+#      description: success
+#      schema:
+#        type: array
+#        items:
+#          $ref: '#/definitions/models.Toggle'
+###
+GET     /:banner/admin/toggles           controllers.Application.toggles(name: Option[String], banner: constants.Banner.Value)
+
+#    ____     ______   _____   ____    __  __    ____    ______    ______   _____
+#   / __ \   / ____/  / ___/  / __ \  / / / /   / __ \  / ____/   / ____/  / ___/
+#  / /_/ /  / __/     \__ \  / / / / / / / /   / /_/ / / /       / __/     \__ \
+# / _, _/  / /___    ___/ / / /_/ / / /_/ /   / _, _/ / /___    / /___    ___/ /
+#/_/ |_|  /_____/   /____/  \____/  \____/   /_/ |_|  \____/   /_____/   /____/
+
+###
+# summary: Get price info for a given product code
+# description: Returns price information for a given product code
+# parameters:
+#   - in: path
+#     name: banner
+#     type: string
+#     enum: [s5a, o5a, lat]
+#     description: a valid Banner name
+#     required: true
+#   - in: query
+#     name: product_code
+#     type: string
+#     description: Unique ID of the product Example - 0459475706564
+#     required: true
+# responses:
+#   200:
+#       description: success
+#       schema:
+#           required:
+#               - 'request'
+#           properties:
+#               request:
+#                   $ref: '#/definitions/models.ApiRequestModel'
+#               response:
+#                   required:
+#                       - 'results'
+#                   properties:
+#                       results:
+#                           type: 'object'
+#                           $ref: '#/definitions/models.PriceViewModel'
+#               errors:
+#                   type: array
+#                   items:
+#                       $ref: '#/definitions/models.ApiErrorModel'
+###
+GET /price-service/:banner/prices                               controllers.Price.pricesByProductCode(banner: constants.Banner.Value, product_code: String)
+
+
+###
+# summary: Get price info for a given product code
+# description: Added for backward compatibility. We no longer use version context in our API.
+# deprecated: true
+###
+GET /v1/price-service/product/$productCode<[0-9]+>                 controllers.Price.getPrice(productCode: String)
+
+###
+# summary: Get price info for a given list of product codes
+# description: Returns price information for a given list of product codes
+# consumes:
+#   - "application/json"
+# parameters:
+#   - in: path
+#     name: banner
+#     type: string
+#     enum: [s5a, o5a, lat]
+#     description: a valid Banner name
+#     required: true
+#   - in: body
+#     name: product_codes
+#     description: Payload with list of product codes
+#     required: true
+#     schema:
+#       type: object
+#       required:
+#           - product_codes
+#       properties:
+#           product_codes:
+#               type: array
+#               items:
+#                   type: string
+# responses:
+#   200:
+#       description: success
+#       schema:
+#           required:
+#               - 'request'
+#           properties:
+#               request:
+#                   $ref: '#/definitions/models.ApiRequestModel'
+#               response:
+#                   required:
+#                       - 'results'
+#                   properties:
+#                       results:
+#                           type: array
+#                           items:
+#                               $ref: '#/definitions/models.PriceViewModel'
+#               errors:
+#                   type: array
+#                   items:
+#                       $ref: '#/definitions/models.ApiErrorModel'
+###
+POST /price-service/:banner/prices             controllers.Price.pricesByProductCodes(currency_code: Option[String], country_code: Option[String], localized_price: Option[Boolean], banner: constants.Banner.Value)
+
+###
+# summary: Get price info for a given list of product codes
+# description: Added for backward compatibility. We no longer use version context in our API.
+# deprecated: true
+###
+POST /v1/price-service/products                                    controllers.Price.getPriceForProducts(currency_code: Option[String], country_code: Option[String], localized_price: Option[Boolean])
+
+###
+# summary: Get price info for a given upc code
+# description: Returns price information for a given upc code
+# parameters:
+#   - in: path
+#     name: banner
+#     type: string
+#     enum: [s5a, o5a, lat]
+#     description: a valid Banner name
+#     required: true
+#   - in: path
+#     name: upc_code
+#     type: string
+#     description: Unique upc code Example -
+#     required: true
+# responses:
+#   200:
+#       description: success
+#       schema:
+#           required:
+#               - 'request'
+#           properties:
+#               request:
+#                   $ref: '#/definitions/models.ApiRequestModel'
+#               response:
+#                   required:
+#                       - 'results'
+#                   properties:
+#                       results:
+#                           type: 'object'
+#                           $ref: '#/definitions/models.PriceViewModel'
+#               errors:
+#                   type: array
+#                   items:
+#                       $ref: '#/definitions/models.ApiErrorModel'
+###
+GET /price-service/:banner/prices/$upc_code<[0-9]+>                            controllers.Price.priceByUpcCode(banner: constants.Banner.Value, upc_code: String)
+
+###
+# summary: Get price info for a given upc code
+# description: Added for backward compatibility. We no longer use version context in our API.
+# deprecated: true
+###
+GET /v1/price-service/upc/$upcCode<[0-9]+>                         controllers.Price.getPriceByUpc(upcCode: String)
+
+###
+# summary: Get international rate for a given currency code
+# description: Returns international rate information for a given currency code
+# parameters:
+#   - in: path
+#     name: currencyCode
+#     type: string
+#     description: Currency code Example - CAD/GBP
+#     required: true
+# responses:
+#   200:
+#       description: success
+#       schema:
+#           required:
+#               - 'request'
+#           properties:
+#               request:
+#                   $ref: '#/definitions/models.ApiRequestModel'
+#               response:
+#                   required:
+#                       - 'results'
+#                   properties:
+#                       results:
+#                           type: 'object'
+#                           $ref: '#/definitions/models.InternationalRates'
+#               errors:
+#                   type: array
+#                   items:
+#                       $ref: '#/definitions/models.ApiErrorModel'
+###
+GET /price-service/intl-rate/currency/$currencyCode<[a-zA-z]+>     controllers.Price.getInternationalRateByCurrencyCode(currencyCode: String)
+
+###
+# summary: Get international rate for a given currency code
+# description: Added for backward compatibility. We no longer use version context in our API.
+# deprecated: true
+###
+GET /v1/price-service/intl-rate/currency/$currencyCode<[a-zA-z]+>     controllers.Price.getInternationalRateByCurrencyCode(currencyCode: String)
+
+###
+# summary: Get international rate for a given country code
+# description: Returns international rate information for a given country code
+# parameters:
+#   - in: path
+#     name: countryCode
+#     type: string
+#     description: Country code Example - CA/UK
+#     required: true
+# responses:
+#   200:
+#       description: success
+#       schema:
+#           required:
+#               - 'request'
+#           properties:
+#               request:
+#                   $ref: '#/definitions/models.ApiRequestModel'
+#               response:
+#                   required:
+#                       - 'results'
+#                   properties:
+#                       results:
+#                           type: 'object'
+#                           $ref: '#/definitions/models.InternationalRates'
+#               errors:
+#                   type: array
+#                   items:
+#                       $ref: '#/definitions/models.ApiErrorModel'
+###
+GET /price-service/intl-rate/country/$countryCode<[a-zA-z]+>       controllers.Price.getInternationalRateByCountryCode(countryCode: String)
+
+###
+# summary: Get international rate for a given country code
+# description: Added for backward compatibility. We no longer use version context in our API.
+# deprecated: true
+###
+GET /v1/price-service/intl-rate/country/$countryCode<[a-zA-z]+>       controllers.Price.getInternationalRateByCountryCode(countryCode: String)

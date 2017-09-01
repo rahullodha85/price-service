@@ -1,0 +1,16 @@
+priceservice:
+  image: sd1pgo01lx.saksdirect.com/price-service:<version>
+  restart: always
+  ports:
+    - "9480:9480"
+  environment:
+    - JAVA_OPTS=-Xms1g -Xmx1g {{key "newrelic"}}
+    - CONSUL_HOST={{key "consul_host"}}
+    - ENV={{key "env"}}
+  log_driver: syslog
+  log_opt:
+    syslog-address: <logstash_url>
+    syslog-tag: <banner>-<env>-<service>
+  labels:
+    - "com.joyent.package=<triton_package>"
+  command: /opt/containerpilot/containerpilot -config /opt/containerpilot/containerpilot.json5

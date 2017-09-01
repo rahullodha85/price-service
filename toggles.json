@@ -1,0 +1,22 @@
+{
+  "item": {
+    "user": "price-service",
+    "toggles": [
+      {
+        "toggle_name": "CANADA_PRICE_BOOK",
+        "description": "",
+        "toggle_type": "Project"
+      },
+      {
+        "toggle_name": "CANADA_PRICE_BOOK_DARK_LAUNCH",
+        "description": "",
+        "toggle_type": "Temporary"
+      },
+      {
+        "toggle_name": "USE_NEW_PRICE_COLLECTION",
+        "description": "",
+        "toggle_type": ""
+      }
+    ]
+  }
+}

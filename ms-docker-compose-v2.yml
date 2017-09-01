@@ -1,0 +1,19 @@
+priceservice:
+  image: sd1pgo01lx.saksdirect.com/price-service:<version>
+  container_name: price
+  hostname: <hostname>
+  restart: always
+  ports:
+    - "9480:9480"
+  environment:
+    - CONFIG_FILE=/opt/price-service-0.1/conf/custom/price-application.conf
+    - JAVA_OPTS=-Xms512m -Xmx512m -javaagent:/opt/newrelic/newrelic.jar
+  volumes:
+    - /saksservices/config:/opt/price-service-0.1/conf/custom
+    - /saksservices/applogs/aem/price:/opt/price-service-0.1/logs
+  labels:
+    io.rancher.container.network: 'true'
+  log_driver: syslog
+  log_opt:
+    syslog-address: <logstash_url>
+    syslog-tag: <banner>-<env>-<service>

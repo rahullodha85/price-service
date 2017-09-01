@@ -1,0 +1,53 @@
+# This is the main configuration file for the application.
+# ~~~~~
+
+# Secret key
+# ~~~~~
+# The secret key is used to secure cryptographics functions.
+#
+# This must be changed for priceion, but we recommend not changing it in this file.
+#
+# See http://www.playframework.com/documentation/latest/ApplicationSecret for more details.
+play.crypto.secret="v7]yr6Mj^04k5]C_Eo`/YGHViwD<v9hfTcFWU1Dv_klxa=D;_R/B5@xm;XQGpBXR"
+
+play.http.context=/
+
+hbc.banner={{ key "banner" }}
+
+# Another Execution Context
+price-service-context {
+  fork-join-executor {
+    {{ key "threading/2cpu" }}
+  }
+}
+
+statsd {
+{{key "graphite"}}
+  metric-namespace="price-service"
+}
+
+
+# web services we need for most/all microservices
+webservices {
+  toggles {
+    url= {{key "toggle_url"}}
+  }
+}
+
+mongo {
+  mongoUri = "mongodb://{{key "price_specific/mongo_user"}}:{{key "price_specific/mongo_password"}}@{{key "mongo_hosts"}}/{{key "price_specific/mongo_db"}}?replicaSet={{key "mongo_replicaset"}}"
+  dbName = {{key "price_specific/mongo_db"}}
+  {{key "price_specific/mongo_param"}}
+}
+
+include "default-template-config.conf"
+
+# Template Version
+template-version="v1.0.32"
+# Template Git Head Commit Hash
+template-commit-hash="f85883e"
+
+# Mongo Template Version
+mongo-template-version="v1.0.21"
+# Mongo Template Git Head Commit Hash
+mongo-template-commit-hash="abdfcd1"

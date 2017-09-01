@@ -1,0 +1,15 @@
+priceservice:
+  image: sd1pgo01lx.saksdirect.com/price-service:<version>
+  container_name: {{key "price_specific/docker-name"}}
+  restart: always
+  ports:
+    - "9480:9480"
+  environment:
+    - JAVA_OPTS={{key "price_specific/java-opts"}}
+    - CONSUL_HOST={{key "consul_host"}}
+    - ENV={{key "env"}}
+  log_driver: syslog
+  log_opt:
+    syslog-address: {{key "logstash/url"}}
+    tag: "{{key "banner"}}-{{key "env"}}-{{key "price_specific/docker-name"}}"
+  command: /opt/containerpilot/containerpilot -config /opt/containerpilot/containerpilot.json5

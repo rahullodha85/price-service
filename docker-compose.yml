@@ -1,0 +1,7 @@
+currentservice:
+  build: docker
+  restart: always
+  ports:
+    - "9000:9000"
+  environment:
+    - CONFIG_FILE=/opt/price-service-0.1/conf/application.conf

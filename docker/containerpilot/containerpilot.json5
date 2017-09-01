@@ -1,0 +1,38 @@
+{
+  consul: "{{.CONSUL_HOST}}",
+  logging: {
+    level: "INFO",
+    format: "text",
+    output: "stdout"
+  },
+  jobs: [
+    {
+      name: "price-service",
+      exec: "/opt/price-service-0.1/bin/price-service -Dhttp.port=9480 -Dpidfile.path=/dev/null -Dconfig.file=/opt/price-service-0.1/conf/price-application.conf -Dlogger.file=/opt/price-service-0.1/conf/docker-logger.xml",
+      restarts: "unlimited",
+      port: 9480,
+      when: {
+        // we want to start this job when the "setup" job has exited with success
+        source: "setup",
+        once: "exitSuccess"
+      },
+      health: {
+        exec: "/usr/bin/curl --fail -s -o /dev/null http://0.0.0.0:9480/admin/status",
+        interval: 10,
+        ttl: 60,
+        timeout: "10s",
+      },
+      interfaces: [
+        "eth0"
+      ]
+    },
+    {
+      name: "setup",
+      exec: "/opt/containerpilot/preStart-script.sh",
+      restarts: "never"
+    }
+  ],
+  control: {
+    socket: "/var/run/containerpilot.socket"
+  }
+}
